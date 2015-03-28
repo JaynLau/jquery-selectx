@@ -35,7 +35,8 @@ selectx = {
             width: $select.outerWidth(),
             height: $select.outerHeight(),
             padding: 0,
-            margin: 0
+            margin: 0,
+            float: 'left'
         });
         
         $iconBlock.css({
@@ -145,6 +146,8 @@ selectx = {
             fontFamily: $select.css('fontFamily'),
             fontSize: $select.css('fontSize'),
             background: '#fff',
+            float: 'left',
+            marginTop: $block.outerHeight() - 1,
             position: 'absolute',
             zIndex: 1000000
         }).hover(
@@ -155,10 +158,6 @@ selectx = {
                 cursorOnList = false;
             }
         );
-        // fix the list position
-        var pos = $block.position();
-        pos.top = pos.top + $block.outerHeight() - 1;
-        $list.offset(pos);
         
         function prepareOption(text, value) {
             var liStart =  (undefined == value || null == value)
