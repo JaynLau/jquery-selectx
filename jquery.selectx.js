@@ -114,6 +114,7 @@ selectx = {
             boxSizing: 'border-box',
             float: 'left'
         }).on('click', function() {
+            prepareAllOption();
             if (expended) {
                 downArrow();
             } else {
@@ -194,6 +195,7 @@ selectx = {
         }
         
         function prepareAllOption() {
+            $list.children().remove();
             $select.children().each(function(i, e){
                 addOption(e);
             });
