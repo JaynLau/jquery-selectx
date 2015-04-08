@@ -175,7 +175,9 @@ selectx = {
                 function() {
                 	$opt.css({
                 		backgroundColor: '#eee'
-                	});
+                	}).siblings().css({
+                        backgroundColor: '#fff'
+                    })
                 },
                 function() {
                 	$opt.css({
@@ -186,6 +188,17 @@ selectx = {
                 $iconBlock.trigger('click');
                 $input.val($opt.text());
                 $value.val($opt.attr('data-value'));
+            }).css({
+                height: function() {
+                    var
+                    toNumber = function(pxVal) {
+                        return parseInt(pxVal.substring(0, pxVal.length - 2)) || 0;
+                    },
+                    height = toNumber($opt.css('paddingTop') || '0px') +
+                           toNumber($opt.css('paddingBottom') || '0px') +
+                           toNumber($opt.css('lineHeight') || '0px');
+                    return height;
+                }()
             });
         }
         
@@ -212,6 +225,21 @@ selectx = {
         
         function showList() {
             if ($list.children().length > 0) {
+                var val = $value.val(),
+                    optVal, $opt;
+                $list.children().each(function(i, e) {
+                    $opt = $(e);
+                    optVal = $opt.attr('data-value');
+                    if (optVal === val) {
+                        $opt.css({
+                            backgroundColor: '#eee'
+                        });
+                    } else {
+                        $opt.css({
+                            backgroundColor: '#fff'
+                        });
+                    }
+                });
                 $list.fadeIn(fadeTime);
             } else {
                 $list.fadeOut(fadeTime);
