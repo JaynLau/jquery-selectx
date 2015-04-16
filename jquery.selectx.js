@@ -2,12 +2,17 @@
 'use strict';
 
 var
+_settings = {
+	editable: false
+},
 selectx = {
-    init: function(select) {
-        var $select = $(select),
+    init: function(select, options) {
+        var settings = $.extend(true, {}, _settings, options),
+        	editable = settings.editable === true ? true : false,
+        	$select = $(select),
             $wrapper = $('<div/>').insertBefore($select),
             $block = $('<div/>').appendTo($wrapper),
-            $input = $('<input/>').appendTo($block),    // 显示option的text
+            $input = $(editable ? '<input/>' : '<span></span>').appendTo($block),    // 显示option的text
             $value = $('<input type="hidden"/>').insertAfter($input),   // 保存select的value，提交到服务器的值
             $iconBlock = $('<div/>').appendTo($block),
             $icon = $('<div/>').appendTo($iconBlock),
@@ -18,8 +23,21 @@ selectx = {
             iconWidth = 18,
             expended = false,
             cursorOnList = false,
+            cursorOnBlock = false,
             fadeTime = 10;
         
+        if (!editable) {
+        	$input.css('cursor', 'pointer').val = function(v) {
+        		return $input.html(v);
+        	};
+        	
+        	$(document).on('click', function(e) {
+        		if (!cursorOnList && !cursorOnBlock && expended) {
+        			downArrow();
+        		}
+        	});
+        }
+
         $wrapper.css({
             display: 'inline-block',
             margin: 0,
@@ -28,7 +46,7 @@ selectx = {
         });
         
         $block.attr({
-            class: $select.attr('class')
+            'class': $select.attr('class')
         }).css({
             display: 'inline-block',
             border: border,
@@ -37,7 +55,14 @@ selectx = {
             padding: 0,
             margin: 0,
             float: 'left'
-        });
+        }).hover(
+            function() {
+                cursorOnBlock = true;
+            },
+            function() {
+                cursorOnBlock = false;
+            }
+        );;
         
         $iconBlock.css({
             display: 'inline-block',
@@ -160,12 +185,21 @@ selectx = {
             }
         );
         
+        function highlightOption(opt) {
+	        $(opt).css({
+	        	backgroundColor: '#eee'
+	        }).siblings().css({
+	            backgroundColor: '#fff'
+	        })
+        }
+        
         function prepareOption(text, value) {
             var liStart =  (undefined == value || null == value)
                             ? '<li>' : '<li data-value="' + value + '">',
                 $opt = $(liStart + text + '</li>').appendTo($list);
 
             $opt.css({
+            	display: 'list-item',
                 padding: '3px',
                 paddingLeft: $select.css('paddingLeft'),
                 paddingRight: $select.css('paddingRight'),
@@ -173,16 +207,7 @@ selectx = {
                 cursor: 'pointer'
             }).hover(
                 function() {
-                	$opt.css({
-                		backgroundColor: '#eee'
-                	}).siblings().css({
-                        backgroundColor: '#fff'
-                    })
-                },
-                function() {
-                	$opt.css({
-                		backgroundColor: '#fff'
-                	});
+                	highlightOption($opt);
                 }
             ).on('click', function() {
                 $iconBlock.trigger('click');
@@ -194,10 +219,14 @@ selectx = {
                     toNumber = function(pxVal) {
                         return parseInt(pxVal.substring(0, pxVal.length - 2)) || 0;
                     },
-                    height = toNumber($opt.css('paddingTop') || '0px') +
-                           toNumber($opt.css('paddingBottom') || '0px') +
-                           toNumber($opt.css('lineHeight') || '0px');
-                    return height;
+                    paddingHeight = toNumber($opt.css('paddingTop') || '0px') +
+                             toNumber($opt.css('paddingBottom') || '0px'),
+                    innerHeight = Math.max(
+                    		toNumber($opt.css('fontSize') || '0px'),
+	                    	Math.max(toNumber($opt.css('lineHeight') || '0px'), $select.height())
+	                );
+                    
+                    return paddingHeight + innerHeight;
                 }()
             });
         }
@@ -258,9 +287,10 @@ selectx = {
     }
 };
 
-$.fn.selectx = function() {
+$.fn.selectx = function(options) {
     return $(this).each(function(i, e) {
-        selectx.init(this);
+        selectx.init(this, options);
     });
 };
+$.fn.selectx.settings = _settings;
 })(jQuery);
