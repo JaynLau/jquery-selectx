@@ -289,7 +289,13 @@ selectx = {
 
 $.fn.selectx = function(options) {
     return $(this).each(function(i, e) {
-        selectx.init(this, options);
+    	var $this = $(this);
+    	if ($this.data('_selectxed_')) {
+    		return;
+    	} else {
+        	selectx.init(this, options);
+        	$this.data('_selectxed_', true);
+    	}
     });
 };
 $.fn.selectx.settings = _settings;
