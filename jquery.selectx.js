@@ -13,7 +13,7 @@ selectx = {
             $wrapper = $('<div/>').insertBefore($select),
             $block = $('<div/>').appendTo($wrapper),
             $input = $(editable ? '<input/>' : '<span></span>').appendTo($block),    // 显示option的text
-            $value = $('<input type="hidden"/>').insertAfter($input),   // 保存select的value，提交到服务器的值
+            $value = $('<input type="hidden"/>').insertAfter($wrapper),   // 保存select的value，提交到服务器的值
             $iconBlock = $('<div/>').appendTo($block),
             $icon = $('<div/>').appendTo($iconBlock),
             $list = $('<ul/>').insertAfter($block),
@@ -217,13 +217,21 @@ selectx = {
                 height: function() {
                     var
                     toNumber = function(pxVal) {
-                        return parseInt(pxVal.substring(0, pxVal.length - 2)) || 0;
+                    	var pos = -1;
+                    	for (var i = pxVal.length - 1, ch; i >= 0; i--) {
+                    		ch = pxVal[i];
+                    		if (ch >= 0 && ch <= 9) {
+                    			pos = i;
+                    		}
+                    	}
+                    	
+                        return pos < 0 ? 0 : parseInt(pxVal.substring(0, pos + 1));
                     },
-                    paddingHeight = toNumber($opt.css('paddingTop') || '0px') +
-                             toNumber($opt.css('paddingBottom') || '0px'),
+                    paddingHeight = toNumber($opt.css('paddingTop')) +
+                             toNumber($opt.css('paddingBottom')),
                     innerHeight = Math.max(
-                    		toNumber($opt.css('fontSize') || '0px'),
-	                    	Math.max(toNumber($opt.css('lineHeight') || '0px'), $select.height())
+                    		toNumber($opt.css('fontSize')),
+	                    	Math.max(toNumber($opt.css('lineHeight')), $select.height())
 	                );
                     
                     return paddingHeight + innerHeight;
